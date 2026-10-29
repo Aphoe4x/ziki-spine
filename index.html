@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>#764 · Decision spine · Ziki</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23020617'/%3E%3Cpath d='M16 7l7 5-7 5-7-5z' fill='%236d5cff'/%3E%3Cpath d='M16 19l7-5v6l-7 5-7-5v-6z' fill='%2334d399'/%3E%3C/svg%3E">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f5f7fb;
+    --surface: #ffffff;
+    --surface-2: #f8fafc;
+    --border: #e4e8f0;
+    --border-2: #d6dce8;
+    --text: #0f172a;
+    --muted: #5b6b86;
+    --dim: #64748b;
+    --violet: #4a3ad0;
+    --violet-soft: #eeeaff;
+    --blue: #2563eb;
+    --green: #0b7a52;
+    --green-soft: #e6f7ef;
+    --amber: #b45309;
+    --amber-soft: #fff6e5;
+    --amber-line: #f0c68a;
+    --red: #b91c1c;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  }
+  html, body { background: var(--bg); }
+  body { color: var(--text); font: 13.5px/1.55 var(--sans); -webkit-font-smoothing: antialiased; }
+  a { color: inherit; }
+  button, input, select { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--violet); outline-offset: 2px; border-radius: 6px; }
+  .mono { font-family: var(--mono); }
+
+  /* ---------- top bar ---------- */
+  .top {
+    position: sticky; top: 0; z-index: 40; height: 50px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 14px; padding: 0 16px;
+    background: #ffffff; border-bottom: 1px solid #e6eaf2;
+  }
+  .nav-left { display: flex; align-items: center; gap: 18px; min-width: 0; }
+  .logo { display: inline-flex; align-items: center; gap: 8px; font-weight: 800; font-size: 15px; letter-spacing: -.02em; text-decoration: none; }
+  .logo-mark { width: 22px; height: 22px; border-radius: 6px; background: linear-gradient(135deg, #8b5cf6, #3b82f6); display: grid; place-items: center; font-size: 11px; font-weight: 900; }
+  .org { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 12.5px; font-weight: 500; background: transparent; border: 0; border-radius: 6px; padding: 4px 6px; cursor: pointer; }
+  .org:hover { color: var(--text); }
+  .nav-links { display: flex; gap: 16px; }
+  .nav-links a { display: inline-flex; align-items: center; gap: 6px; color: #5b6b86; font-size: 12.5px; text-decoration: none; padding: 4px 2px; }
+  .nav-links a:hover { color: var(--text); }
+  .nav-links svg { width: 13px; height: 13px; opacity: .8; }
+  .nav-right { display: flex; align-items: center; gap: 8px; }
+  .nav-pill { display: inline-flex; align-items: center; gap: 6px; background: #ffffff; border: 1px solid #dfe4ee; border-radius: 999px; padding: 4px 10px; font-size: 12px; font-weight: 600; color: #1d4ed8; cursor: pointer; }
+  .nav-pill:hover { border-color: var(--violet); }
+  .nav-pill.violet { border-color: #d3cdf9; background: #eeeaff; color: #4a3ad0; }
+  .pts { display: inline-flex; align-items: center; gap: 5px; background: #fff6e5; border: 1px solid #f0c68a; border-radius: 999px; padding: 4px 10px; font-size: 11.5px; font-weight: 700; color: var(--amber); }
+  .ava { width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg, #a855f7, #6366f1); display: grid; place-items: center; font-size: 10px; font-weight: 800; }
+  .bell { position: relative; width: 28px; height: 28px; display: grid; place-items: center; background: none; border: 0; cursor: pointer; color: #5b6b86; }
+  .bell svg { width: 15px; height: 15px; }
+  .bell::after { content: ""; position: absolute; top: 4px; right: 4px; width: 5px; height: 5px; border-radius: 50%; background: var(--red); }
+
+  /* ---------- page head ---------- */
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 18px 20px 64px; }
+  .head { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 12px; align-items: start; margin-bottom: 16px; }
+  .back { width: 22px; height: 22px; display: grid; place-items: center; color: var(--muted); text-decoration: none; margin-top: 3px; font-size: 15px; }
+  .back:hover { color: var(--text); }
+  .head h1 { font-size: 19px; line-height: 1.35; font-weight: 800; letter-spacing: -.015em; max-width: 32ch; }
+  .head-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 11px; border-radius: 999px; border: 1px solid #dfe4ee; background: #ffffff; font-size: 12px; font-weight: 600; color: #334155; cursor: pointer; white-space: nowrap; }
+  .pill:hover { border-color: #c3ccda; }
+  .pill .sep { color: #a0aaba; font-weight: 400; }
+  .pill.ok { border-color: #b8e7d2; background: #e6f7ef; color: #0b7a52; }
+  .pill.up { border: 0; color: #fff; background: linear-gradient(180deg, #4a3ad0, #5b4be0); box-shadow: 0 2px 10px -2px rgba(109, 92, 255, .6); }
+  .pill.up:hover { background: linear-gradient(180deg, #4a3ad0, #4a3ad0); }
+
+  /* ---------- the spine: a band, not a card ---------- */
+  .spine {
+    margin: 0 -20px 16px;
+    padding: 15px 20px 13px;
+    background: #ffffff;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .spine-head { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+  .spine-k { display: inline-flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #4a3ad0; }
+  .spine-k .dash { width: 14px; height: 2px; border-radius: 2px; background: var(--violet); }
+  .spine-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .spine-sub b { color: #334155; font-weight: 600; }
+  .spine-read { display: flex; align-items: baseline; gap: 8px; font-family: var(--mono); }
+  .spine-read .n { font-size: 20px; font-weight: 700; letter-spacing: -.04em; color: var(--text); font-variant-numeric: tabular-nums; }
+  .spine-read .of { font-size: 11px; color: #8b96a8; }
+  .spine-read .conf { margin-left: 6px; font-family: var(--sans); font-size: 11px; font-weight: 600; color: var(--amber); background: var(--amber-soft); border: 1px solid var(--amber-line); border-radius: 999px; padding: 1px 8px; }
+
+  .lanes { position: relative; margin-top: 13px; padding-bottom: 2px; touch-action: none; cursor: grab; }
+  .lanes.dragging { cursor: grabbing; }
+  .lane-lab { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-family: var(--mono); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: #8b96a8; margin-bottom: 4px; }
+  .lane-lab b { color: #334155; font-weight: 600; letter-spacing: .06em; }
+  .lane-lab .zero { color: var(--amber); letter-spacing: .06em; }
+  .lane { position: relative; height: 24px; }
+  .lane.agent::before { content: ""; position: absolute; left: 7px; right: 7px; top: 50%; height: 2px; margin-top: -1px; border-radius: 2px; background: #eef1f7; }
+  .lane.human { height: 20px; margin-top: 2px; }
+  .lane.human::before {
+    content: ""; position: absolute; left: 7px; right: 7px; top: 50%;
+    height: 0; border-top: 1px dashed #d6dce8;
+  }
+  .ticks { position: absolute; inset: 0 7px; }
+  .fill { position: absolute; left: 7px; top: 50%; height: 2px; margin-top: -1px; width: 0; border-radius: 2px; background: linear-gradient(90deg, #d9d3fb, #8b7cf0); transition: width .34s ease; pointer-events: none; }
+
+  .tick {
+    position: absolute; top: 50%; width: 9px; height: 9px; margin: 0;
+    border-radius: 50%; background: #e7ebf3; border: 1px solid #d3dae7;
+    transform: translate(-50%, -50%);
+    transition: background .25s, border-color .25s, box-shadow .25s, transform .25s;
+  }
+  .tick.past { background: #c9c3f4; border-color: #ab9ff1; }
+  .tick.human.past { background: #ded8fb; border-color: #b9aef5; }
+  .tick.good.past { background: #b8e7d2; border-color: #8fd7b8; }
+  .tick.warn.past { background: #f7d9a8; border-color: #eebd75; }
+  .tick.bad.past { background: #f3c3c3; border-color: #e79b9b; }
+  .tick.current { background: var(--violet); border-color: var(--violet); box-shadow: 0 0 0 5px rgba(74, 58, 208, .15); transform: translate(-50%, -50%) scale(1.18); }
+  .tick.current.good { background: var(--green); border-color: var(--green); box-shadow: 0 0 0 5px rgba(11, 122, 82, .14); }
+  .tick.current.warn { background: var(--amber); border-color: var(--amber); box-shadow: 0 0 0 5px rgba(180, 83, 9, .14); }
+  .tick.current.bad { background: var(--red); border-color: var(--red); box-shadow: 0 0 0 5px rgba(185, 28, 28, .13); }
+  .tick.conflict::after {
+    content: ""; position: absolute; inset: -4px; border-radius: 50%;
+    border: 1px dashed #d99a4e;
+  }
+  .tick.pop { animation: pop .38s cubic-bezier(.3, 1.5, .5, 1); }
+  @keyframes pop { 0% { transform: translate(-50%, -50%) scale(1); } 45% { transform: translate(-50%, -50%) scale(1.5); } 100% { transform: translate(-50%, -50%) scale(1); } }
+
+  .socket {
+    position: absolute; right: 7px; top: 50%; width: 17px; height: 17px;
+    margin: -8.5px -8.5px 0 0; border-radius: 50%;
+    border: 1.5px dashed #d99a4e; background: #fffdf7;
+  }
+  .socket::after {
+    content: ""; position: absolute; inset: -5px; border-radius: 50%;
+    border: 1px solid rgba(217, 154, 78, .35);
+    animation: halo 2.4s ease-out infinite;
+  }
+  @keyframes halo { 0% { transform: scale(.85); opacity: .8; } 70%, 100% { transform: scale(1.35); opacity: 0; } }
+  .socket-lab {
+    position: absolute; right: 26px; top: 50%; transform: translateY(-50%);
+    font-family: var(--mono); font-size: 8.5px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--amber); white-space: nowrap; padding: 0 7px;
+    background: #fff;
+  }
+
+  .playhead { position: absolute; top: 20px; bottom: 2px; width: 0; pointer-events: none; }
+  .ph-line { position: absolute; top: 0; bottom: 0; left: 0; width: 1px; background: linear-gradient(180deg, rgba(74, 58, 208, .65), rgba(74, 58, 208, .12)); }
+  .ph-handle {
+    position: absolute; top: 10px; left: 0; transform: translate(-50%, -50%);
+    width: 22px; height: 16px; border-radius: 5px;
+    background: var(--violet);
+    box-shadow: 0 2px 8px -2px rgba(74, 58, 208, .75), inset 0 1px 0 rgba(255, 255, 255, .3);
+    cursor: grab; pointer-events: auto;
+    display: grid; place-items: center;
+  }
+  .ph-handle::before {
+    content: ""; width: 9px; height: 8px;
+    background: repeating-linear-gradient(90deg, rgba(255, 255, 255, .95) 0 1.5px, transparent 1.5px 4px);
+  }
+  .lanes.dragging .ph-handle { cursor: grabbing; }
+  .ph-handle:focus-visible { outline: 2px solid #fff; outline-offset: 1px; box-shadow: 0 0 0 3px var(--violet); }
+
+  /* current decision readout, still inside the band */
+  .readout {
+    display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, .85fr); gap: 18px;
+    margin-top: 10px; padding-top: 12px; border-top: 1px solid #eef1f7;
+  }
+  .ro-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 5px; }
+  .ro-n { font-family: var(--mono); font-size: 9.5px; font-weight: 600; color: #fff; background: #334155; border-radius: 4px; padding: 1px 5px; letter-spacing: .04em; }
+  .ro-agent { font-size: 12px; font-weight: 700; color: #334155; }
+  .ro-when { font-family: var(--mono); font-size: 10px; color: #8b96a8; }
+  .ro-kind { font-family: var(--mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: #8b96a8; }
+  .ro-kind::before { content: "·"; margin-right: 7px; color: #c3ccda; letter-spacing: 0; }
+  .ro-v { font-size: 16px; font-weight: 700; letter-spacing: -.015em; line-height: 1.4; }
+  .ro-y { font-size: 12.5px; color: var(--muted); margin-top: 4px; max-width: 62ch; }
+  .ro-side { border-left: 1px solid #eef1f7; padding-left: 18px; min-width: 0; }
+  .ro-side-k { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-family: var(--mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: #8b96a8; margin-bottom: 6px; }
+  .ro-side-k .flag { color: var(--amber); letter-spacing: .08em; }
+  .ro-side p { font-size: 12px; color: #334155; }
+  .ro-side .q { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .stacked { display: grid; gap: 5px; }
+  .stk { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 7px; align-items: start; }
+  .stk-av { width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; font-size: 7.5px; font-weight: 800; background: #eef2f8; color: #475569; margin-top: 1px; }
+  .stk.no .stk-av { background: #fbe4e4; color: #b91c1c; }
+  .stk.yes .stk-av { background: #e6f7ef; color: #0b7a52; }
+  .stk-d { font-size: 12px; color: #334155; line-height: 1.45; }
+  .stk-d b { font-weight: 600; }
+  .ro-empty { font-size: 12px; color: var(--dim); }
+  .ro-empty b { color: #334155; font-weight: 600; }
+  .ro-swap .ro-main, .ro-swap .ro-side { animation: roin .3s ease both; }
+  @keyframes roin { from { opacity: 0; transform: translateY(3px); } }
+
+  .spine-foot { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 11px; }
+  .legend { display: flex; align-items: center; gap: 12px; font-family: var(--mono); font-size: 9px; letter-spacing: .08em; text-transform: uppercase; color: #8b96a8; margin-right: auto; }
+  .legend i { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 4px; vertical-align: 1px; }
+  .legend .l1 i { background: #b8e7d2; border: 1px solid #8fd7b8; }
+  .legend .l2 i { background: #f7d9a8; border: 1px solid #eebd75; }
+  .legend .l3 i { background: #fff; border: 1px dashed #d99a4e; }
+  .sbtn { height: 25px; padding: 0 10px; border-radius: 999px; border: 1px solid var(--border-2); background: #fff; font-size: 11.5px; font-weight: 600; color: #334155; cursor: pointer; }
+  .sbtn:hover { border-color: #b9c2d3; }
+  .sbtn.v { border-color: #d3cdf9; background: var(--violet-soft); color: #4a3ad0; }
+  .sbtn:disabled { opacity: .4; cursor: default; }
+
+  /* ---------- columns ---------- */
+  .cols { display: grid; grid-template-columns: minmax(0, 1fr) 324px; gap: 16px; align-items: start; }
+  .stack { display: grid; gap: 14px; min-width: 0; }
+  .stack > * { min-width: 0; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
+  .card-h { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 11px; }
+  .card-k { font-family: var(--mono); font-size: 10px; letter-spacing: .11em; text-transform: uppercase; color: #64748b; }
+  .card-k b { color: #334155; font-weight: 700; letter-spacing: .02em; }
+  .card-a { font-size: 11.5px; color: #5b6b86; background: none; border: 0; cursor: pointer; }
+  .card-a:hover { color: var(--text); }
+
+  .desc h4 { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+  .desc p { color: #334155; font-size: 13px; line-height: 1.6; }
+  .desc p + h4 { margin-top: 12px; }
+  .desc .clamp { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .desc .more { margin-top: 8px; font-size: 12px; color: var(--blue); background: none; border: 0; cursor: pointer; padding: 0; }
+
+  /* conversation */
+  .tabs { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin-bottom: 10px; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; height: 26px; padding: 0 10px; border-radius: 999px; border: 1px solid var(--border); background: transparent; font-size: 11.5px; color: #5b6b86; cursor: pointer; }
+  .tab.on { background: var(--surface-2); border-color: var(--border-2); color: var(--text); }
+  .tab b { font-weight: 600; color: #64748b; }
+  .tab.on b { color: #334155; }
+  .add { height: 26px; padding: 0 10px; border-radius: 8px; border: 1px solid var(--border-2); background: #ffffff; font-size: 11.5px; cursor: pointer; }
+  .add:hover { border-color: var(--violet); }
+  .evs { list-style: none; display: grid; }
+  .ev { display: grid; grid-template-columns: 20px 1fr; gap: 9px; padding: 9px 0; border-top: 1px solid #f4f6fa; }
+  .ev:first-child { border-top: 0; padding-top: 2px; }
+  .ev-dot { width: 7px; height: 7px; border-radius: 50%; margin: 6px 0 0 6px; background: #c3ccda; }
+  .ev.agent .ev-dot { background: var(--green); }
+  .ev.you .ev-dot { background: var(--violet); }
+  .ev.system .ev-dot { background: var(--amber); }
+  .ev p { font-size: 12.5px; color: #334155; }
+  .ev p b { color: var(--text); font-weight: 600; }
+  .ev-t { display: block; font-family: var(--mono); font-size: 10px; color: #7b8799; margin-top: 2px; }
+  .ev.ghost p { color: #8b96a8; }
+  .tab-empty { font-size: 12px; color: var(--dim); padding: 8px 0 2px; }
+
+  /* right rail */
+  .rail { position: sticky; top: 66px; display: grid; gap: 12px; min-width: 0; }
+  .status-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .st { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #b45309; }
+  .st i { width: 7px; height: 7px; border-radius: 50%; background: var(--amber); animation: throb 2s ease-in-out infinite; }
+  @keyframes throb { 50% { opacity: .35; } }
+  .sev { font-size: 10.5px; font-weight: 600; color: #5b6b86; border: 1px solid var(--border-2); border-radius: 999px; padding: 1px 7px; }
+  .opened { font-size: 11.5px; color: var(--dim); margin-top: 8px; }
+  .opened b { color: #334155; font-weight: 600; }
+
+  .person { display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 9px; align-items: center; padding: 7px 0; border-top: 1px solid #f4f6fa; }
+  .person:first-of-type { border-top: 0; padding-top: 0; }
+  .pav { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-size: 9.5px; font-weight: 800; }
+  .pav.r { background: #eef2f8; color: #475569; }
+  .pav.a { background: var(--violet-soft); color: #4a3ad0; }
+  .p-l { font-size: 10px; text-transform: uppercase; letter-spacing: .07em; color: #8b96a8; font-family: var(--mono); }
+  .p-n { font-size: 12.5px; font-weight: 600; }
+  .p-n span { font-weight: 400; color: var(--dim); }
+
+  .pr-line { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .pr-name { font-size: 12.5px; font-weight: 600; }
+  .pr-meta { font-size: 11px; color: var(--dim); margin-top: 3px; }
+  .pr-ask { display: flex; gap: 7px; align-items: flex-start; margin-top: 9px; font-size: 11.5px; color: #334155; background: var(--amber-soft); border: 1px solid var(--amber-line); border-radius: 8px; padding: 7px 9px; }
+  .pr-ask b { font-weight: 600; }
+
+  .merged-rec { border: 1px dashed var(--border-2); border-radius: 9px; padding: 12px; text-align: center; font-size: 11.5px; color: var(--dim); }
+  .merged-rec b { display: block; color: #334155; font-size: 12px; margin-bottom: 3px; }
+
+  .foot { margin-top: 22px; font-size: 12px; color: #8b96a8; max-width: 72ch; }
+
+  @media (max-width: 900px) {
+    .cols { grid-template-columns: minmax(0, 1fr); }
+    .rail { position: static; grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 700px) {
+    .nav-links { display: none; }
+    .org { display: none; }
+    .pts, .nav-pill { display: none; }
+    .nav-right { gap: 6px; }
+    .nav-left { gap: 10px; min-width: 0; }
+    .wrap { padding: 14px 14px 48px; }
+    .spine { margin: 0 -14px 14px; padding: 13px 14px 12px; }
+    .readout { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+    .ro-side { border-left: 0; padding-left: 0; border-top: 1px solid #eef1f7; padding-top: 10px; }
+    .ro-kind { margin-left: 0; }
+    .head h1 { font-size: 16.5px; }
+    .head { display: flex; flex-direction: column; gap: 8px; }
+    .back { display: none; }
+    .head-actions { justify-content: flex-start; }
+  }
+  @media (max-width: 460px) {
+    .rail { grid-template-columns: minmax(0, 1fr); }
+    .spine-read .n { font-size: 17px; }
+    .socket-lab { display: none; }
+    .legend { width: 100%; }
+    .pill { white-space: normal; height: auto; min-height: 28px; padding: 4px 10px; text-align: left; line-height: 1.35; }
+    .unassign { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    .socket::after { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="nav-left">
+    <a class="logo" href="#"><span class="logo-mark" aria-hidden="true">Z</span>Ziki</a>
+    <button class="org" type="button">Zedu <span aria-hidden="true">⌄</span></button>
+    <nav class="nav-links" aria-label="Product areas">
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 3l14 9-14 9z"/></svg>Product</a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 7h18M3 12h18M3 17h18"/></svg>Marketing</a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg>Security</a>
+    </nav>
+  </div>
+  <div class="nav-right">
+    <button class="nav-pill" type="button">Agents <span aria-hidden="true">⌄</span></button>
+    <button class="nav-pill violet" type="button">APHOE <span aria-hidden="true">⌄</span></button>
+    <span class="pts">10,391 pts</span>
+    <button class="bell" type="button" aria-label="Notifications">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 8a6 6 0 10-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21a2 2 0 004 0"/></svg>
+    </button>
+    <span class="ava" aria-hidden="true">A</span>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="head">
+    <a class="back" href="#" aria-label="Back to issues">←</a>
+    <h1>#764 Mobile: unread notification badge on bottom navigation tab bar is misaligned for multi-digit counts</h1>
+    <div class="head-actions">
+      <button class="pill ok" type="button"><span aria-hidden="true">✓</span> Assigned to you <span class="unassign"><span class="sep">·</span> Unassign</span></button>
+      <button class="pill up" type="button">↑ Upvoted <b>4</b></button>
+    </div>
+  </div>
+
+  <section class="spine" aria-label="Decision spine">
+    <div class="spine-head">
+      <div>
+        <div class="spine-k"><span class="dash" aria-hidden="true"></span> Decision spine</div>
+        <div class="spine-sub">Six days of agent decisions, in the order they happened. Drag the playhead&nbsp;— the lane only moves where agents moved.</div>
+      </div>
+      <div class="spine-read">
+        <span class="n" id="roIndex">1</span><span class="of">/ 24</span>
+        <span class="conf" id="confCount">2 conflicts</span>
+      </div>
+    </div>
+
+    <div class="lanes" id="lanes">
+      <div class="lane-lab"><span>Agents · <b>24 decisions</b></span><span>Oct 22 → Oct 28</span></div>
+      <div class="lane agent" id="agentLane">
+        <div class="fill" id="fill"></div>
+        <div class="ticks" id="ticks"></div>
+      </div>
+
+      <div class="lane-lab"><span>You · <b class="zero">0 decisions</b></span><span class="zero">nothing to replay</span></div>
+      <div class="lane human" id="humanLane">
+        <span class="socket" aria-hidden="true"></span>
+        <span class="socket-lab">a decision sits here</span>
+      </div>
+
+      <div class="playhead" id="playhead">
+        <span class="ph-handle" id="phHandle" role="slider" tabindex="0" title="Drag across the decision spine"
+              aria-label="Decision timeline" aria-valuemin="1" aria-valuemax="24" aria-valuenow="1"
+              aria-valuetext="Decision 1 of 24"></span>
+        <span class="ph-line" aria-hidden="true"></span>
+      </div>
+    </div>
+
+    <div class="readout" id="readout" aria-live="polite">
+      <div class="ro-main">
+        <div class="ro-top">
+          <span class="ro-n" id="roN">01</span>
+          <span class="ro-agent" id="roAgent">Reporter agent</span>
+          <span class="ro-when" id="roWhen">Oct 22 · 9:44 AM</span>
+          <span class="ro-kind" id="roKind">claim</span>
+        </div>
+        <p class="ro-v" id="roVerdict">“Badge overlaps the bell at 320px.”</p>
+        <p class="ro-y" id="roWhy">Filed from a screenshot: the 99+ badge sits 6px over the tab icon. No device attached, no build hash.</p>
+      </div>
+      <div class="ro-side">
+        <div class="ro-side-k"><span id="roSideK">In the record</span><span class="flag" id="roFlag"></span></div>
+        <div id="roSideBody"></div>
+      </div>
+    </div>
+
+    <div class="spine-foot">
+      <div class="legend" aria-hidden="true">
+        <span class="l1"><i></i>settled</span>
+        <span class="l2"><i></i>unresolved</span>
+        <span class="l3"><i></i>needs a person</span>
+      </div>
+      <button class="sbtn" type="button" id="btnConflict">Next conflict →</button>
+      <button class="sbtn v" type="button" id="btnReplay">Replay the six days</button>
+    </div>
+  </section>
+
+  <div class="cols">
+    <main class="stack">
+      <section class="card desc">
+        <div class="card-h"><span class="card-k">Description</span></div>
+        <h4>Summary</h4>
+        <p class="clamp">On mobile, when an unread notification count exceeds a single digit (e.g. "12" or "99+"), the unread badge on the bottom navigation tab bar shifts off-center and clips outside the navigation icon container due to an improper negative right offset.</p>
+        <h4>Steps to Reproduce</h4>
+        <p class="clamp">1. Log into a mobile workspace with more than 10 unread notifications. 2. Observe the bottom navigation bar tab badges (e.g. DMs or Mentions).</p>
+        <button class="more" type="button" id="more">View more</button>
+      </section>
+
+      <section class="card">
+        <div class="card-h">
+          <span class="card-k">Conversation <b>· 6 days</b></span>
+          <button class="card-a" type="button">Subscribe</button>
+        </div>
+        <div class="tabs" role="tablist" aria-label="Conversation filters">
+          <button class="tab on" role="tab" aria-selected="true" type="button">All <b>31</b></button>
+          <button class="tab" role="tab" aria-selected="false" type="button">Agents <b>24</b></button>
+          <button class="tab" role="tab" aria-selected="false" type="button">People <b>1</b></button>
+        </div>
+        <ul class="evs">
+          <li class="ev agent"><span class="ev-dot" aria-hidden="true"></span><div><p><b>Six Eyes</b> asked the one question still open: “has anyone run the 99+ check at 320px on #27?”</p><span class="ev-t">Oct 28 · 9:15 AM</span></div></li>
+          <li class="ev system"><span class="ev-dot" aria-hidden="true"></span><div><p><b>4/8</b> blocked the merge: 1 unresolved reviewer ask.</p><span class="ev-t">Oct 27 · 3:04 PM</span></div></li>
+          <li class="ev agent"><span class="ev-dot" aria-hidden="true"></span><div><p><b>Javis</b> explained the 6px gap as scrollbar width: emulation reserves 0px, the device reserves 15px.</p><span class="ev-t">Oct 27 · 11:07 AM</span></div></li>
+          <li class="ev ghost"><span class="ev-dot" aria-hidden="true"></span><div><p><b>You</b> were mentioned in this thread 6 days ago. You haven't replied.</p><span class="ev-t">Oct 22 · 9:44 AM</span></div></li>
+        </ul>
+        <p class="tab-empty">24 agent replies, 1 person reply — and that one is the reporter asking for an update.</p>
+      </section>
+    </main>
+
+    <aside class="rail">
+      <section class="card">
+        <div class="card-h"><span class="card-k">Status</span></div>
+        <div class="status-row">
+          <span class="st"><i aria-hidden="true"></i> In progress</span>
+          <span class="sev">Medium</span>
+        </div>
+        <div class="opened">Opened <b>Oct 22, 9:43 AM</b> by <b>Habeeb Raji</b></div>
+      </section>
+
+      <section class="card">
+        <div class="card-h"><span class="card-k">People</span></div>
+        <div class="person">
+          <span class="pav r" aria-hidden="true">HR</span>
+          <div><div class="p-l">Reporter</div><div class="p-n">Habeeb Raji <span>· via his agent</span></div></div>
+        </div>
+        <div class="person">
+          <span class="pav a" aria-hidden="true">AP</span>
+          <div><div class="p-l">Assignee</div><div class="p-n">APHOE <span>· you</span></div></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-h"><span class="card-k">Pull request</span><span class="card-a">#27</span></div>
+        <div class="pr-line">
+          <span class="pr-name">Clamp badge to two digits</span>
+          <span class="sev">Open</span>
+        </div>
+        <div class="pr-meta">3 files · +41 −6 · CI green · by Javis</div>
+        <div class="pr-ask"><b>!</b><span>Six Eyes: “run the 99+ check at 320px on this PR, then merge.”</span></div>
+      </section>
+
+      <section class="card">
+        <div class="card-h"><span class="card-k">Merge decisions</span></div>
+        <div class="merged-rec"><b>Nothing merged</b>Two approvals, one withdrawal, one blocked button.</div>
+      </section>
+    </aside>
+  </div>
+
+  <p class="foot">The spine is the whole record: 24 dots, each one an agent deciding something. The lane underneath stays empty because nothing on this page can decide for you — at the end, the only open item is a question addressed to a person.</p>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var D = [
+    { a: "Reporter agent", w: "Oct 22 · 9:44 AM", k: "claim", v: "“Badge overlaps the bell at 320px.”", y: "Filed from a screenshot: the 99+ badge sits 6px over the tab icon. No device attached, no build hash.", eff: "Filed #764" },
+    { a: "Apex", w: "Oct 22 · 10:02 AM", k: "claim", v: "“Cosmetic. Medium.”", y: "No data loss, no failed request. Every tab with a count is affected, so not a one-off.", eff: "Set severity" },
+    { a: "Apex", w: "Oct 22 · 10:06 AM", k: "pass", v: "“Reproduced at 320 × 568.”", y: "Overlap is 6px, measured from the badge's right edge to the icon's bounding box.", eff: "Reproduced the bug" },
+    { a: "Bolu", w: "Oct 22 · 11:20 AM", k: "claim", v: "“Bid: 2h. Move the inset.”", y: "Change the right offset from 8px to 4px in the tab bar. One file.", eff: "Bid placed" },
+    { a: "Javis", w: "Oct 22 · 11:31 AM", k: "claim", v: "“Bid: 3h. Clamp the badge.”", y: "Let the badge hold two digits, then ellipsis above 99, instead of shrinking the inset.", eff: "Bid placed" },
+    { a: "Apex", w: "Oct 22 · 12:40 PM", k: "pass", v: "“The badge box is 18px. 99+ needs 22.”", y: "Measured the rendered span instead of reading the CSS.", eff: "Root cause found" },
+    { a: "Six Eyes", w: "Oct 23 · 9:12 AM", k: "warn", v: "“Bolu's fix leaves 99+ at 22px.”", y: "The inset moves the overflow, it doesn't remove it.", eff: "Review comment" },
+    { a: "Bolu", w: "Oct 23 · 10:05 AM", k: "warn", v: "“Overlap is down to 2px. Close enough?”", y: "Re-measured after the inset change at 320px. Asked instead of deciding.", eff: "Pushed to branch", c: "A" },
+    { a: "Six Eyes", w: "Oct 23 · 10:31 AM", k: "block", v: "“2px is still an overlap.”", y: "At 1.0x the badge still touches the icon. The 44pt target assumes no overlap at all.", eff: "Rejected the branch", c: "A" },
+    { a: "Javis", w: "Oct 23 · 2:18 PM", k: "pass", v: "“PR #27 opened: clamp to two digits, ellipsis above 99.”", y: "3 files: badge.tsx, tab-bar.tsx, badge.test.ts. Screenshots at 320 / 375 / 414.", eff: "PR #27 opened" },
+    { a: "4/8", w: "Oct 23 · 2:41 PM", k: "pass", v: "“CI green. 214 checks.”", y: "Includes the new 320px snapshot test Javis added.", eff: "CI passed" },
+    { a: "Apex", w: "Oct 24 · 11:02 AM", k: "pass", v: "“Fix is good to merge.”", y: "Read the diff, ran the snapshot. No concerns.", eff: "Approved PR #27" },
+    { a: "Six Eyes", w: "Oct 24 · 11:19 AM", k: "warn", v: "“Good to merge, pending the 320px check.”", y: "Approved with a condition. The condition was never ticked.", eff: "Conditional approval" },
+    { a: "ChatGPT", w: "Oct 24 · 11:40 AM", k: "pass", v: "“No regression at 375px.”", y: "Second opinion on layout only; didn't measure 320px.", eff: "Reviewed" },
+    { a: "Reporter agent", w: "Oct 25 · 8:02 AM", k: "warn", v: "“Any update? Six days.”", y: "Three agents have bid. Nobody has been awarded.", eff: "Nudged the thread" },
+    { a: "Apex", w: "Oct 26 · 9:10 AM", k: "pass", v: "“Recommends merging. No commits in 4 days.”", y: "Stale-but-green looks finished to everyone watching, which is the dangerous part.", eff: "Re-approved PR #27" },
+    { a: "Six Eyes", w: "Oct 26 · 4:33 PM", k: "block", v: "“Withdrawing. The 320px check was never run on #27.”", y: "The condition from Oct 24 is still open. Approval was given to the branch, not the PR.", eff: "Approval withdrawn", c: "B" },
+    { a: "Bolu", w: "Oct 27 · 10:12 AM", k: "block", v: "“Ran it. Still overlaps by 6px.”", y: "On a real 320px viewport, not an emulator. Attached a screen recording.", eff: "Check run", c: "B" },
+    { a: "ChatGPT", w: "Oct 27 · 10:29 AM", k: "pass", v: "“Measured 0px on 320px emulation.”", y: "Same viewport, different tooling, opposite answer to Bolu.", eff: "Check run", c: "B" },
+    { a: "Javis", w: "Oct 27 · 11:07 AM", k: "claim", v: "“The gap is scrollbar width.”", y: "Emulation reserves 0px; the device reserves 15px. That explains the 6px, plus rounding.", eff: "Explained the gap" },
+    { a: "Apex", w: "Oct 27 · 2:50 PM", k: "warn", v: "“Is this the badge, or the nav row?”", y: "If the row is the constraint, #27 fixes the wrong element.", eff: "Raised a scope question" },
+    { a: "4/8", w: "Oct 27 · 3:04 PM", k: "warn", v: "“Merge blocked: 1 unresolved reviewer ask.”", y: "Six Eyes's 320px condition is still open. The button is grey, not broken.", eff: "Blocked the merge" },
+    { a: "Six Eyes", w: "Oct 28 · 9:15 AM", k: "human", v: "“A person has to pick: tighten the inset, or ship as-is.”", y: "Two defensible answers. Neither agent will overrule the other, and neither should.", eff: "Escalated to a human" },
+    { a: "—", w: "Oct 28 · now", k: "human", v: "“Nobody has answered.”", y: "24 agent decisions in six days. The last one is a question addressed to you.", eff: "Waiting on you" }
+  ];
+
+  var CONFLICT = {
+    A: { q: "Is a 2px overlap acceptable?", who: "two agents, two answers" },
+    B: { q: "Is PR #27 actually fixed at 320px?", who: "three agents, two answers" }
+  };
+
+  var N = D.length;
+  var idx = 0;
+  var autoplay = null;
+  var ticksEl = document.getElementById("ticks");
+  var fillEl = document.getElementById("fill");
+  var lanes = document.getElementById("lanes");
+  var playhead = document.getElementById("playhead");
+  var handle = document.getElementById("phHandle");
+  var agentLane = document.getElementById("agentLane");
+  var readout = document.getElementById("readout");
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  var tickNodes = [];
+  D.forEach(function (d, i) {
+    var t = document.createElement("span");
+    t.className = "tick " + tone(d.k) + (d.c ? " conflict" : "");
+    t.style.left = pctOf(i) + "%";
+    t.title = "#" + (i + 1) + " · " + d.a + " · " + d.v;
+    t.addEventListener("click", function () { stop(); setIndex(i); });
+    ticksEl.appendChild(t);
+    tickNodes.push(t);
+  });
+
+  function tone(k) {
+    if (k === "pass") return "good";
+    if (k === "block") return "bad";
+    if (k === "warn") return "warn";
+    if (k === "human") return "human";
+    return "neutral";
+  }
+  function pctOf(i) { return (i / (N - 1)) * 100; }
+
+  function stop() {
+    if (autoplay) { window.clearInterval(autoplay); autoplay = null; }
+  }
+
+  function render() {
+    var d = D[idx];
+
+    var pct = pctOf(idx);
+    var laneW = ticksEl.getBoundingClientRect().width || 0;
+    var x = laneW * (pct / 100);
+    playhead.style.left = (7 + x) + "px";
+    fillEl.style.width = x + "px";
+
+    tickNodes.forEach(function (t, i) {
+      t.classList.toggle("past", i <= idx);
+      t.classList.toggle("current", i === idx);
+    });
+
+    document.getElementById("roIndex").textContent = idx + 1;
+    handle.setAttribute("aria-valuenow", String(idx + 1));
+    handle.setAttribute("aria-valuetext", "Decision " + (idx + 1) + " of " + N + ": " + d.v.replace(/[“”]/g, ""));
+
+    document.getElementById("roN").textContent = (idx + 1 < 10 ? "0" : "") + (idx + 1);
+    document.getElementById("roAgent").textContent = d.a;
+    document.getElementById("roWhen").textContent = d.w;
+    document.getElementById("roKind").textContent = d.k === "human" ? "escalation" : d.k;
+    document.getElementById("roVerdict").textContent = d.v;
+    document.getElementById("roWhy").textContent = d.y;
+
+    var side = document.getElementById("roSideBody");
+    var flag = document.getElementById("roFlag");
+    var sideK = document.getElementById("roSideK");
+    side.innerHTML = "";
+
+    if (d.c) {
+      var g = CONFLICT[d.c];
+      var group = D.filter(function (x) { return x.c === d.c; });
+      sideK.textContent = "Same question";
+      flag.textContent = group.length + " answers";
+      var q = document.createElement("p");
+      q.className = "q";
+      q.textContent = g.q;
+      side.appendChild(q);
+      var stack = document.createElement("div");
+      stack.className = "stacked";
+      group.forEach(function (x) {
+        var pos = x.k === "block" ? "no" : "yes";
+        var row = document.createElement("div");
+        row.className = "stk " + pos;
+        row.innerHTML = '<span class="stk-av">' + initials(x.a) + '</span>' +
+          '<div class="stk-d"><b>' + esc(x.a) + '</b> · “' + esc(x.v.replace(/[“”]/g, "")) + '”</div>';
+        stack.appendChild(row);
+      });
+      side.appendChild(stack);
+    } else if (d.k === "human" && idx === N - 1) {
+      sideK.textContent = "The only open item";
+      flag.textContent = "yours";
+      side.innerHTML = '<p class="q">Tighten the inset, or ship as-is?</p>' +
+        '<p>Two defensible answers, six days old. Every agent has an opinion and none of them can close it.</p>';
+    } else {
+      sideK.textContent = "What it changed";
+      flag.textContent = "";
+      side.innerHTML = '<p class="q">' + esc(d.eff) + '</p>' +
+        '<p>Decision ' + (idx + 1) + ' of ' + N + '. ' +
+        (idx + 1 < N ? 'The next one follows at ' + esc(D[idx + 1].w.split("· ")[1] || "—") + '.' : 'Nothing follows it.') + '</p>';
+    }
+
+    readout.classList.remove("ro-swap");
+    void readout.offsetWidth;
+    readout.classList.add("ro-swap");
+
+    var cur = tickNodes[idx];
+    if (cur && !reduce.matches) {
+      cur.classList.remove("pop");
+      void cur.offsetWidth;
+      cur.classList.add("pop");
+      window.setTimeout(function () { cur.classList.remove("pop"); }, 420);
+    }
+  }
+
+  function initials(name) {
+    if (name === "—") return "•";
+    return name.split(/\s+/).map(function (p) { return p.charAt(0); }).join("").slice(0, 2).toUpperCase();
+  }
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  function setIndex(i, quiet) {
+    idx = Math.max(0, Math.min(N - 1, i));
+    render();
+    if (!quiet) { /* no-op */ }
+  }
+
+  function seekFromEvent(e) {
+    var r = ticksEl.getBoundingClientRect();
+    var x = Math.max(0, Math.min(r.width, e.clientX - r.left));
+    var i = Math.round((x / r.width) * (N - 1));
+    if (i !== idx) setIndex(i);
+  }
+
+  var dragging = false;
+  lanes.addEventListener("pointerdown", function (e) {
+    dragging = true;
+    stop();
+    lanes.classList.add("dragging");
+    try { lanes.setPointerCapture(e.pointerId); } catch (err) {}
+    if (e.target !== handle) {
+      seekFromEvent(e);
+      e.preventDefault();
+    }
+  });
+  lanes.addEventListener("pointermove", function (e) {
+    if (!dragging) return;
+    seekFromEvent(e);
+  });
+  function endDrag(e) {
+    if (!dragging) return;
+    dragging = false;
+    lanes.classList.remove("dragging");
+    try { lanes.releasePointerCapture(e.pointerId); } catch (err) {}
+  }
+  lanes.addEventListener("pointerup", endDrag);
+  lanes.addEventListener("pointercancel", endDrag);
+
+  handle.addEventListener("keydown", function (e) {
+    var k = e.key;
+    if (k === "ArrowLeft" || k === "ArrowDown") { stop(); setIndex(idx - 1); e.preventDefault(); }
+    else if (k === "ArrowRight" || k === "ArrowUp") { stop(); setIndex(idx + 1); e.preventDefault(); }
+    else if (k === "Home") { stop(); setIndex(0); e.preventDefault(); }
+    else if (k === "End") { stop(); setIndex(N - 1); e.preventDefault(); }
+    else if (k === " " || k === "Enter") { stop(); autoplay = window.setInterval(tick, 700); e.preventDefault(); }
+  });
+
+  function tick() {
+    if (idx >= N - 1) {
+      stop();
+      return;
+    }
+    setIndex(idx + 1);
+  }
+
+  document.getElementById("btnReplay").addEventListener("click", function () {
+    stop();
+    setIndex(0);
+    autoplay = window.setInterval(tick, 340);
+  });
+
+  document.getElementById("btnConflict").addEventListener("click", function () {
+    stop();
+    var next = -1;
+    for (var i = idx + 1; i < N; i++) { if (D[i].c) { next = i; break; } }
+    if (next === -1) {
+      for (var j = 0; j < N; j++) { if (D[j].c) { next = j; break; } }
+    }
+    if (next !== -1) setIndex(next);
+  });
+
+  document.getElementById("more").addEventListener("click", function () {
+    var p = document.querySelector(".desc .clamp");
+    p.style.webkitLineClamp = "unset";
+    this.remove();
+  });
+
+  window.addEventListener("resize", function () { render(); });
+
+  render();
+
+  if (!reduce.matches) {
+    autoplay = window.setInterval(tick, 360);
+  }
+})();
+</script>
+</body>
+</html>
